@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan *)",
+      "Bash(npm run *)",
+      "Bash(python *)",
+      "Bash(rm -f /c/Users/sanzz/AppData/Local/Temp/claude/pitou-redesign-cookies.txt)",
+      "Bash(curl -s -o /tmp/login.html -w '%{http_code}\\\\n' -c /c/Users/sanzz/AppData/Local/Temp/claude/pitou-redesign-cookies.txt http://127.0.0.1:8124/login)",
+      "Read(//tmp/**)",
+      "Bash(awk '{print $7}')",
+      "PowerShell(php artisan test)",
+      "PowerShell(npm run *)",
+      "PowerShell(php artisan tinker --execute=\"echo App\\\\Models\\\\PaymentMethod::where\\('is_active', true\\)->pluck\\('code'\\)->join\\(', '\\); echo PHP_EOL . 'invoice_next: ' . App\\\\Models\\\\Transaction::query\\(\\)->count\\(\\) . ' trx';\")",
+      "PowerShell(php artisan tinker --execute=\"App\\\\Models\\\\PaymentMethod::all\\(['code','name','is_active']\\)->each\\(fn\\($m\\) => print\\($m->code . ' => ' . \\($m->is_active ? 'aktif' : 'nonaktif'\\) . PHP_EOL\\)\\);\")",
+      "PowerShell(npx vitest run 2>&1 | Out-String)",
+      "PowerShell(npx vitest run resources/js/lib/offline 2>&1 | Out-String)",
+      "PowerShell(npx vitest run 2>&1 | Select-Object -Last 12 | Out-String)",
+      "PowerShell(php artisan test --filter=OfflineSyncTest 2>&1 | Select-Object -Last 30 | Out-String)",
+      "PowerShell(php artisan test 2>&1 | Select-Object -Last 15 | Out-String)",
+      "PowerShell(npx vitest run 2>&1 | Select-Object -Last 6 | Out-String)",
+      "PowerShell(npx vitest run resources/js/lib/__tests__/whatsapp.test.ts 2>&1 | Select-Object -Last 15 | Out-String)",
+      "Bash(npm install *)",
+      "Bash(npx cap *)",
+      "Bash(php scripts/android-assets.php)",
+      "Bash(xxd)",
+      "Bash(npx vitest *)"
+    ]
+  }
+}

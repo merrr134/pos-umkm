@@ -1,0 +1,263 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animasi ringan halaman Login (fade + scale, ≤300ms — PRD Bab 14) */
+@keyframes login-fade-scale {
+    from {
+        opacity: 0;
+        transform: scale(0.97) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes login-fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Bottom sheet keranjang mobile — slide-up (PRD Bab 14) */
+@keyframes sheet-up {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Toast notifikasi — slide dari kanan atas (PRD Bab 14) */
+@keyframes toast-slide {
+    from {
+        opacity: 0;
+        transform: translateX(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Ripple tombol (Fase 13) — transform + opacity, 300ms */
+@keyframes ui-ripple {
+    to {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+.ui-ripple {
+    position: absolute;
+    border-radius: 9999px;
+    background: currentColor;
+    opacity: 0.16;
+    transform: scale(0);
+    pointer-events: none;
+    animation: ui-ripple 300ms ease-out forwards;
+}
+
+/* Shimmer skeleton (Fase 13) — sweep via transform, hormati
+   prefers-reduced-motion (fallback: pulse bawaan tetap jalan) */
+@keyframes ui-shimmer {
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .shimmer {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .shimmer::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.7),
+            transparent
+        );
+        animation: ui-shimmer 1.2s ease-in-out infinite;
+    }
+}
+
+/* ==================== Struk thermal 58mm ====================
+   Satu sumber gaya untuk preview & cetak agar hasilnya identik:
+   - font monospace dengan metrik stabil (Courier New) — bukan
+     ui-monospace yang disubstitusi berbeda di jalur print
+   - table-layout: fixed + colgroup → lebar kolom deterministik,
+     identik antar blok (info/item/ringkasan), tidak pernah
+     melebihi 58mm → angka selalu rata kanan sejajar
+   - satu line-height & ukuran berbasis kelas (tanpa px inline acak)
+   - logo di luar tabel → tidak memengaruhi perhitungan kolom */
+.receipt {
+    /* PRINTABLE AREA head thermal 58mm hanya ±48mm (384 dot @203dpi)
+       — bukan 58mm penuh. Konten wajib muat 48mm, terpusat, sehingga
+       tersisa ±5mm margin kiri & kanan; nominal rata kanan tidak
+       pernah menyentuh batas zona cetak → digit tidak terpotong. */
+    width: 48mm;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 2mm 0 3mm;
+    background: #fff;
+    color: #000;
+    font-family: 'Courier New', Courier, monospace;
+    /* 12px = ukuran maksimum agar baris terpanjang (label "Tanggal"
+       + nomor TRX-YYYYMMDD-0001 17 karakter) muat dalam 48mm */
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.receipt table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.receipt td {
+    padding: 0;
+    vertical-align: top;
+    overflow-wrap: break-word;
+}
+
+/* Kolom nilai info transaksi — 34mm memuat TRX-YYYYMMDD-0001
+   (17 karakter Courier 12px ≈ 32,5mm); sisa 14mm pas untuk label
+   terpanjang "Tanggal" (7 karakter ≈ 13,9mm) */
+.receipt col.receipt-col-value {
+    width: 34mm;
+}
+
+/* Kolom nominal FIXED 24mm — memuat 1.250.000 (9 kar.) bahkan pada
+   font TOTAL 15px (≈21,5mm) dan s.d. 12 karakter pada font isi;
+   label panjang membungkus di kolom kiri, angka tidak pernah
+   terpotong maupun keluar area cetak */
+.receipt col.receipt-col-amount {
+    width: 24mm;
+}
+
+.receipt .receipt-num {
+    text-align: right;
+}
+
+.receipt .receipt-center {
+    text-align: center;
+}
+
+/* Separator — garis SOLID hitam penuh (dashed sering ter-dither
+   tipis di head thermal), jarak seragam */
+.receipt-sep {
+    border: none;
+    border-top: 1px solid #000;
+    margin: 6px 0;
+}
+
+.receipt-store {
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1.3;
+}
+
+/* Logo: blok mandiri di luar tabel, benar-benar terpusat
+   (margin auto), ±90px, render tajam untuk head thermal 1-bit */
+.receipt-logo {
+    display: block;
+    margin: 0 auto 6px;
+    max-width: 90px;
+    max-height: 90px;
+    object-fit: contain;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+
+.receipt-item td {
+    padding-bottom: 4px;
+}
+
+.receipt-item .receipt-num {
+    vertical-align: bottom;
+}
+
+.receipt-note {
+    font-size: 11px;
+}
+
+.receipt-total td {
+    font-weight: 700;
+    font-size: 15px;
+    padding-top: 4px;
+}
+
+/* Salinan cetak di-portal langsung ke <body> — bebas dari
+   ancestor modal ber-transform/overflow-hidden yang menjadikan
+   dirinya containing block & MEMOTONG hasil print (akar masalah
+   "browser rapi, printer terpotong/bergeser") */
+.receipt-print-root {
+    display: none;
+}
+
+/* Cetak struk thermal 58mm via window.print() (PRD 5.5) —
+   hanya area #receipt-print (salinan portal) yang tercetak.
+
+   PENTING — akar bug "cetakan kecil/tipis/geser kiri":
+   pendekatan lama `body * { visibility: hidden }` MEMPERTAHANKAN
+   layout aplikasi selebar desktop, sehingga browser menskalakan
+   seluruh halaman agar muat 58mm (± faktor 0,2) → teks efektif
+   ±3px, ter-dither tipis seperti kehabisan tinta, dan struk ikut
+   bergeser. Solusi: aplikasi di-display:none — satu-satunya
+   layout saat print adalah struk 58mm itu sendiri, tanpa skala. */
+@media print {
+    @page {
+        size: 58mm auto;
+        margin: 0;
+    }
+
+    html,
+    body {
+        width: 58mm;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
+
+    /* Sembunyikan seluruh aplikasi (root Inertia + portal modal) —
+       hanya salinan struk yang tersisa di layout */
+    body > *:not(#receipt-print) {
+        display: none !important;
+    }
+
+    #receipt-print.receipt-print-root {
+        display: block;
+        position: static;
+        width: 58mm;
+        margin: 0;
+    }
+
+    /* Hitam pekat & tanpa rasterisasi: tidak ada opacity, warna
+       abu, transform, filter, atau shadow yang membuat browser
+       me-raster halaman (penyebab hasil pudar di thermal) */
+    #receipt-print,
+    #receipt-print * {
+        color: #000 !important;
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pitou Cafe</string>
+    <string name="title_activity_main">Pitou Cafe</string>
+    <string name="package_name">com.pitou.pos</string>
+    <string name="custom_url_scheme">pitoupos</string>
+    <!-- Host App Link https:// (Fase 17 §6) — ganti ke domain produksi -->
+    <string name="deep_link_host">pos.pitoucafe.example</string>
+</resources>
