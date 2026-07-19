@@ -6,9 +6,10 @@ const config: CapacitorConfig = {
   webDir: 'public/build',
 
   server: {
-    url: 'http://localhost:8000',
-    cleartext: true,
-    androidScheme: 'http',
+    // Server produksi (Railway) — aplikasi mandiri lewat internet,
+    // tanpa laptop/kabel/tunnel. Origin https → PWA/offline aktif penuh.
+    url: 'https://pos-umkm-production.up.railway.app',
+    androidScheme: 'https',
   },
 
   plugins: {
