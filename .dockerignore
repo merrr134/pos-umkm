@@ -1,0 +1,21 @@
+# Konteks build ramping — semua ini di-generate/ tidak dibutuhkan di server.
+.git
+.github
+node_modules
+vendor
+android
+public/build
+public/hot
+public/storage
+storage/app/public/*
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+.env
+.env.*
+*.md
+docs
+tests
+.phpunit.result.cache
+scratchpad

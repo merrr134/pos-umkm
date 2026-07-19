@@ -737,7 +737,7 @@ export default function Index({
 
             {/* Tab + Tambah Produk (kanan atas) */}
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+                <div className="flex max-w-full overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 shadow-sm [scrollbar-width:none] [&>*]:shrink-0 [&>*]:whitespace-nowrap [&::-webkit-scrollbar]:hidden">
                     <span className="rounded-lg bg-[#0A45FE] px-4 py-2 text-sm font-semibold text-white">
                         Daftar Produk
                     </span>

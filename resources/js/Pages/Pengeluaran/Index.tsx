@@ -309,7 +309,7 @@ export default function Index({
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                 {/* Toggle daftar aktif / terhapus — Owner only */}
                 {can.viewTrash ? (
-                    <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+                    <div className="flex max-w-full overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 shadow-sm [scrollbar-width:none] [&>*]:shrink-0 [&>*]:whitespace-nowrap [&::-webkit-scrollbar]:hidden">
                         <button
                             type="button"
                             onClick={() => setTrashView(false)}

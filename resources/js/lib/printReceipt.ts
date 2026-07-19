@@ -1,9 +1,9 @@
 import { ReceiptProfile, ReceiptTransaction } from '@/Pages/Kasir/kasir';
 import { encodeReceipt } from './escpos';
 import {
-    BluetoothPrinterService,
     PrinterError,
     PRINTER_ERROR_MESSAGES,
+    PrinterService,
     printerService,
 } from './printerService';
 
@@ -44,7 +44,7 @@ function browserPrint(): boolean {
 export async function printReceipt(
     receipt: ReceiptTransaction,
     profile: ReceiptProfile,
-    service: BluetoothPrinterService = printerService,
+    service: PrinterService = printerService,
 ): Promise<PrintResult> {
     let fallbackReason: string | null = null;
 

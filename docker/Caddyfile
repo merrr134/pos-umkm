@@ -1,0 +1,15 @@
+# FrankenPHP/Caddy untuk Laravel di Railway.
+# HTTPS ditangani oleh edge Railway, jadi container cukud HTTP di $PORT.
+{
+	auto_https off
+	admin off
+	frankenphp
+}
+
+:{$PORT:8080} {
+	root * /app/public
+	encode zstd br gzip
+
+	# Layani file statis dulu, sisanya ke index.php (Laravel).
+	php_server
+}

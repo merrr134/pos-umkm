@@ -56,7 +56,7 @@ export default function InstallPrompt() {
             <img
                 src="/icons/icon-192.png"
                 alt="Pitou Cafe POS"
-                className="h-9 w-9 rounded-xl"
+                className="h-9 w-9 shrink-0 rounded-xl"
             />
             <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-900">

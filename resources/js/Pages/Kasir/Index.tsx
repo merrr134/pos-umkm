@@ -75,7 +75,7 @@ function ProductCard({
             // Ripple global dilewati — badge qty berada di luar bounds
             data-no-ripple
             className={
-                'group relative flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-3 text-left shadow-sm transition-all duration-150 ' +
+                'group relative flex h-full w-full flex-col rounded-2xl border border-slate-200 bg-white p-3 text-left shadow-sm transition-all duration-150 ' +
                 (clickable
                     ? 'hover:-translate-y-0.5 hover:border-[#0A45FE]/40 hover:shadow-md active:scale-[0.98]'
                     : 'cursor-not-allowed')
@@ -90,7 +90,7 @@ function ProductCard({
 
             <div
                 className={
-                    'relative aspect-square w-full overflow-hidden rounded-xl bg-slate-50 ' +
+                    'relative aspect-square w-full shrink-0 overflow-hidden rounded-xl bg-slate-50 ' +
                     (product.sellable ? '' : 'opacity-50')
                 }
             >
@@ -306,9 +306,9 @@ function CartPanel({
     const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
     return (
-        <div className="flex h-full min-h-0 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div>
                     <h2 className="text-lg font-bold text-slate-900">
                         Keranjang
@@ -330,132 +330,143 @@ function CartPanel({
                 </button>
             </div>
 
-            {/* Daftar item */}
-            <div className="min-h-0 flex-1 overflow-y-auto">
-                {cart.length === 0 ? (
-                    <div className="flex h-full min-h-40 flex-col items-center justify-center gap-3 py-8 text-center">
-                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-                            <CartIcon className="h-7 w-7" />
-                        </span>
-                        <div>
-                            <p className="font-semibold text-slate-700">
-                                Keranjang kosong
-                            </p>
-                            <p className="mt-1 text-sm text-slate-500">
-                                Klik produk untuk menambahkan.
-                            </p>
+            {/* Area yang bisa di-scroll: item + diskon + ringkasan. Di layar
+                pendek (mis. HP landscape) seluruh bagian ini dapat digulir,
+                sementara tombol Bayar tetap menempel di bawah & bisa diklik. */}
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                {/* Daftar item — tumbuh agar ringkasan menempel ke bawah saat
+                    item sedikit (tampilan desktop tetap seperti semula). */}
+                <div className="min-h-40 flex-1">
+                    {cart.length === 0 ? (
+                        <div className="flex h-full min-h-40 flex-col items-center justify-center gap-3 py-8 text-center">
+                            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                                <CartIcon className="h-7 w-7" />
+                            </span>
+                            <div>
+                                <p className="font-semibold text-slate-700">
+                                    Keranjang kosong
+                                </p>
+                                <p className="mt-1 text-sm text-slate-500">
+                                    Klik produk untuk menambahkan.
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    cart.map((item) => (
-                        <CartItemRow
-                            key={item.product.id}
-                            item={item}
-                            onIncrease={() => onIncrease(item.product.id)}
-                            onDecrease={() => onDecrease(item.product.id)}
-                            onRemove={() => onRemove(item.product.id)}
-                            onNoteChange={(note) =>
-                                onNoteChange(item.product.id, note)
+                    ) : (
+                        cart.map((item) => (
+                            <CartItemRow
+                                key={item.product.id}
+                                item={item}
+                                onIncrease={() => onIncrease(item.product.id)}
+                                onDecrease={() => onDecrease(item.product.id)}
+                                onRemove={() => onRemove(item.product.id)}
+                                onNoteChange={(note) =>
+                                    onNoteChange(item.product.id, note)
+                                }
+                            />
+                        ))
+                    )}
+                </div>
+
+                {/* Diskon */}
+                <div className="shrink-0 border-t border-slate-100 pt-4">
+                    <label
+                        htmlFor="cart-discount"
+                        className="block text-sm font-medium text-slate-900"
+                    >
+                        Diskon
+                    </label>
+                    <div className="mt-2 flex gap-2">
+                        <div className="inline-flex shrink-0 rounded-xl border border-slate-200 bg-slate-50 p-1">
+                            <button
+                                type="button"
+                                onClick={() => onDiscountTypeChange('nominal')}
+                                className={
+                                    'rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ' +
+                                    (discountType === 'nominal'
+                                        ? 'bg-white text-[#0A45FE] shadow-sm'
+                                        : 'text-slate-500')
+                                }
+                            >
+                                Rp
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onDiscountTypeChange('percent')}
+                                className={
+                                    'rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ' +
+                                    (discountType === 'percent'
+                                        ? 'bg-white text-[#0A45FE] shadow-sm'
+                                        : 'text-slate-500')
+                                }
+                            >
+                                %
+                            </button>
+                        </div>
+                        <input
+                            id="cart-discount"
+                            type="number"
+                            min={0}
+                            max={discountType === 'percent' ? 100 : undefined}
+                            value={discountValue}
+                            placeholder="0"
+                            className="block w-full rounded-xl border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-[#0A45FE] focus:ring-[#0A45FE]"
+                            onChange={(e) =>
+                                onDiscountValueChange(e.target.value)
                             }
                         />
-                    ))
-                )}
-            </div>
-
-            {/* Diskon */}
-            <div className="border-t border-slate-100 pt-4">
-                <label
-                    htmlFor="cart-discount"
-                    className="block text-sm font-medium text-slate-900"
-                >
-                    Diskon
-                </label>
-                <div className="mt-2 flex gap-2">
-                    <div className="inline-flex shrink-0 rounded-xl border border-slate-200 bg-slate-50 p-1">
-                        <button
-                            type="button"
-                            onClick={() => onDiscountTypeChange('nominal')}
-                            className={
-                                'rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ' +
-                                (discountType === 'nominal'
-                                    ? 'bg-white text-[#0A45FE] shadow-sm'
-                                    : 'text-slate-500')
-                            }
-                        >
-                            Rp
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => onDiscountTypeChange('percent')}
-                            className={
-                                'rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ' +
-                                (discountType === 'percent'
-                                    ? 'bg-white text-[#0A45FE] shadow-sm'
-                                    : 'text-slate-500')
-                            }
-                        >
-                            %
-                        </button>
                     </div>
-                    <input
-                        id="cart-discount"
-                        type="number"
-                        min={0}
-                        max={discountType === 'percent' ? 100 : undefined}
-                        value={discountValue}
-                        placeholder="0"
-                        className="block w-full rounded-xl border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-[#0A45FE] focus:ring-[#0A45FE]"
-                        onChange={(e) => onDiscountValueChange(e.target.value)}
-                    />
                 </div>
-            </div>
 
-            {/* Ringkasan */}
-            <div className="mt-4 space-y-2 border-t border-slate-100 pt-4">
-                {/* Count-up saat nilai berubah (Fase 13 — PRD Bab 14) */}
-                <div className="flex items-center justify-between text-slate-600">
-                    <span>Subtotal</span>
-                    <span className="font-medium text-slate-900">
-                        <CountUp value={subtotal} format={formatRupiah} />
-                    </span>
-                </div>
-                <div className="flex items-center justify-between text-slate-600">
-                    <span>Diskon</span>
-                    <span
-                        className={
-                            'font-medium ' +
-                            (discount > 0 ? 'text-red-600' : 'text-slate-900')
-                        }
-                    >
-                        {discount > 0 ? '− ' : ''}
-                        <CountUp value={discount} format={formatRupiah} />
-                    </span>
-                </div>
-                {/* Pajak OFF → baris pajak tidak muncul (PRD 5.13.B) */}
-                {taxLabel !== null && (
+                {/* Ringkasan */}
+                <div className="mt-4 shrink-0 space-y-2 border-t border-slate-100 pt-4">
+                    {/* Count-up saat nilai berubah (Fase 13 — PRD Bab 14) */}
                     <div className="flex items-center justify-between text-slate-600">
-                        <span>{taxLabel}</span>
+                        <span>Subtotal</span>
                         <span className="font-medium text-slate-900">
-                            <CountUp value={tax} format={formatRupiah} />
+                            <CountUp value={subtotal} format={formatRupiah} />
                         </span>
                     </div>
-                )}
-                <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-                    <span className="text-lg font-bold text-slate-900">
-                        Total
-                    </span>
-                    <span className="text-xl font-extrabold text-[#0A45FE]">
-                        <CountUp value={total} format={formatRupiah} />
-                    </span>
+                    <div className="flex items-center justify-between text-slate-600">
+                        <span>Diskon</span>
+                        <span
+                            className={
+                                'font-medium ' +
+                                (discount > 0
+                                    ? 'text-red-600'
+                                    : 'text-slate-900')
+                            }
+                        >
+                            {discount > 0 ? '− ' : ''}
+                            <CountUp value={discount} format={formatRupiah} />
+                        </span>
+                    </div>
+                    {/* Pajak OFF → baris pajak tidak muncul (PRD 5.13.B) */}
+                    {taxLabel !== null && (
+                        <div className="flex items-center justify-between text-slate-600">
+                            <span>{taxLabel}</span>
+                            <span className="font-medium text-slate-900">
+                                <CountUp value={tax} format={formatRupiah} />
+                            </span>
+                        </div>
+                    )}
+                    <div className="flex items-center justify-between border-t border-slate-100 pt-3">
+                        <span className="text-lg font-bold text-slate-900">
+                            Total
+                        </span>
+                        <span className="text-xl font-extrabold text-[#0A45FE]">
+                            <CountUp value={total} format={formatRupiah} />
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            {/* Tombol Bayar — di bagian bawah panel (PRD 5.2) */}
+            {/* Tombol Bayar — selalu menempel di bawah panel & bisa diklik
+                (PRD 5.2), termasuk saat area di atas digulir. */}
             <button
                 type="button"
                 disabled={cart.length === 0}
                 onClick={onPay}
-                className="mt-4 flex w-full items-center justify-center gap-2.5 rounded-xl bg-[#0A45FE] py-3.5 text-lg font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#0838d1] disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-4 flex w-full shrink-0 items-center justify-center gap-2.5 rounded-xl bg-[#0A45FE] py-3.5 text-lg font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#0838d1] disabled:cursor-not-allowed disabled:opacity-50"
             >
                 <CreditCardIcon className="h-5 w-5" />
                 Bayar
@@ -547,6 +558,17 @@ export default function Index({
     );
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [showMobileCart, setShowMobileCart] = useState(false);
+
+    // Kunci scroll latar saat bottom sheet keranjang (mobile) terbuka,
+    // agar konten di belakang tidak ikut bergeser & sheet stabil.
+    useEffect(() => {
+        if (!showMobileCart) return;
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = prev;
+        };
+    }, [showMobileCart]);
 
     // Fase 5 — pembayaran, preview struk, toast sukses
     const [showPayment, setShowPayment] = useState(false);

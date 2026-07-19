@@ -299,64 +299,81 @@ export default function PaymentModal({
                     })}
                 </div>
 
-                {/* Tunai: input uang + shortcut + kembalian realtime.
-                    Non-tunai: field uang disembunyikan (PRD 5.3) */}
-                {isCash && (
-                    <div className="mt-4">
-                        <label
-                            htmlFor="cash-amount"
-                            className="block text-sm font-medium text-slate-900"
-                        >
-                            Uang Pelanggan
-                        </label>
-                        <input
-                            id="cash-amount"
-                            type="number"
-                            min={0}
-                            value={cash}
-                            placeholder="0"
-                            className="mt-2 block w-full rounded-xl border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-[#0A45FE] focus:ring-[#0A45FE]"
-                            onChange={(e) => setCash(e.target.value)}
-                        />
-                        <div className="mt-2 flex flex-wrap gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setCash(String(total))}
-                                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:border-[#0A45FE]/40 hover:text-[#0A45FE]"
+                {/* Bagian Tunai — MENGEMPIS mulus (grid-rows 1fr<->0fr +
+                    opacity, ~200ms) saat metode non-tunai (QRIS) dipilih,
+                    tanpa menyisakan ruang kosong. Tidak memakai spacer,
+                    placeholder, atau min-height. Jarak atas diletakkan di
+                    dalam (pt-4) agar ikut mengempis saat tertutup. */}
+                <div
+                    className={
+                        'grid transition-all duration-200 ease-out ' +
+                        (isCash
+                            ? 'grid-rows-[1fr] opacity-100'
+                            : 'grid-rows-[0fr] opacity-0')
+                    }
+                    aria-hidden={!isCash}
+                >
+                    <div className="overflow-hidden">
+                        <div className="pt-4">
+                            <label
+                                htmlFor="cash-amount"
+                                className="block text-sm font-medium text-slate-900"
                             >
-                                Uang Pas
-                            </button>
-                            {CASH_SHORTCUTS.map((amount) => (
+                                Uang Pelanggan
+                            </label>
+                            <input
+                                id="cash-amount"
+                                type="number"
+                                min={0}
+                                value={cash}
+                                placeholder="0"
+                                disabled={!isCash}
+                                tabIndex={isCash ? undefined : -1}
+                                className="mt-2 block w-full rounded-xl border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-[#0A45FE] focus:ring-[#0A45FE]"
+                                onChange={(e) => setCash(e.target.value)}
+                            />
+                            <div className="mt-2 flex flex-wrap gap-2">
                                 <button
-                                    key={amount}
                                     type="button"
-                                    onClick={() => setCash(String(amount))}
+                                    tabIndex={isCash ? undefined : -1}
+                                    onClick={() => setCash(String(total))}
                                     className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:border-[#0A45FE]/40 hover:text-[#0A45FE]"
                                 >
-                                    {amount.toLocaleString('id-ID')}
+                                    Uang Pas
                                 </button>
-                            ))}
-                        </div>
+                                {CASH_SHORTCUTS.map((amount) => (
+                                    <button
+                                        key={amount}
+                                        type="button"
+                                        tabIndex={isCash ? undefined : -1}
+                                        onClick={() => setCash(String(amount))}
+                                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:border-[#0A45FE]/40 hover:text-[#0A45FE]"
+                                    >
+                                        {amount.toLocaleString('id-ID')}
+                                    </button>
+                                ))}
+                            </div>
 
-                        {cash !== '' &&
-                            (cashInsufficient ? (
-                                <p className="mt-3 flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
-                                    <AlertTriangleIcon className="h-4 w-4 shrink-0" />
-                                    Uang pelanggan kurang{' '}
-                                    {formatRupiah(total - cashAmount)}.
-                                </p>
-                            ) : (
-                                <div className="mt-3 flex items-center justify-between rounded-xl bg-green-50 px-3.5 py-2.5">
-                                    <span className="text-sm font-medium text-green-800">
-                                        Kembalian
-                                    </span>
-                                    <span className="text-lg font-bold text-green-700">
-                                        {formatRupiah(change)}
-                                    </span>
-                                </div>
-                            ))}
+                            {cash !== '' &&
+                                (cashInsufficient ? (
+                                    <p className="mt-3 flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
+                                        <AlertTriangleIcon className="h-4 w-4 shrink-0" />
+                                        Uang pelanggan kurang{' '}
+                                        {formatRupiah(total - cashAmount)}.
+                                    </p>
+                                ) : (
+                                    <div className="mt-3 flex items-center justify-between rounded-xl bg-green-50 px-3.5 py-2.5">
+                                        <span className="text-sm font-medium text-green-800">
+                                            Kembalian
+                                        </span>
+                                        <span className="text-lg font-bold text-green-700">
+                                            {formatRupiah(change)}
+                                        </span>
+                                    </div>
+                                ))}
+                        </div>
                     </div>
-                )}
+                </div>
 
                 {/* Nomor WhatsApp pelanggan (opsional) — struk digital Fase 16 */}
                 <div className="mt-4">

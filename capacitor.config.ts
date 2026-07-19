@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'public/build',
 
   server: {
-    url: 'http://10.94.242.71:8000',
+    url: 'http://localhost:8000',
     cleartext: true,
     androidScheme: 'http',
   },

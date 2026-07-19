@@ -8,7 +8,28 @@
  * fallback ke print browser.
  */
 
+import { Capacitor } from '@capacitor/core';
+import { nativePrinterService } from './nativePrinterService';
+
 export type PrinterStatus = 'disconnected' | 'connecting' | 'connected';
+
+/**
+ * Antarmuka bersama service printer. Diimplementasikan oleh dua jalur:
+ * BluetoothPrinterService (Web Bluetooth, browser desktop) dan
+ * NativeBluetoothPrinterService (Bluetooth Classic SPP, Android/APK).
+ * Pemanggil (printReceipt/usePrinter/PrinterPanel) cukup tahu antarmuka
+ * ini sehingga jalur cetak tidak berubah antar platform.
+ */
+export interface PrinterService {
+    isSupported(): boolean;
+    isConnected(): boolean;
+    connect(): Promise<void>;
+    disconnect(): void;
+    print(data: Uint8Array): Promise<void>;
+    subscribe(listener: (status: PrinterStatus) => void): () => void;
+    getStatus(): PrinterStatus;
+    getDeviceName(): string | null;
+}
 
 export type PrinterErrorCode =
     | 'unsupported'
@@ -83,7 +104,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
     });
 }
 
-export class BluetoothPrinterService {
+export class BluetoothPrinterService implements PrinterService {
     private device: BluetoothDevice | null = null;
     private characteristic: BluetoothRemoteGATTCharacteristic | null = null;
     private status: PrinterStatus = 'disconnected';
@@ -280,5 +301,12 @@ export class BluetoothPrinterService {
     }
 }
 
-/** Instance tunggal — status printer bertahan antar halaman Inertia. */
-export const printerService = new BluetoothPrinterService();
+/**
+ * Instance tunggal — status printer bertahan antar halaman Inertia.
+ * Di dalam APK (Capacitor native) memakai Bluetooth Classic SPP; di
+ * browser desktop memakai Web Bluetooth. Import native ditaruh di sini
+ * (akhir file) agar binding PrinterError sudah terinisialisasi.
+ */
+export const printerService: PrinterService = Capacitor.isNativePlatform()
+    ? nativePrinterService
+    : new BluetoothPrinterService();

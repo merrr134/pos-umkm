@@ -132,7 +132,7 @@ export default function Login({ status }: { status?: string }) {
                             <img
                                 src={store.logo}
                                 alt={store.name}
-                                className="h-10 w-10 object-contain"
+                                className="h-10 w-10 shrink-0 object-contain"
                             />
                         ) : (
                             <PitouLogo className="h-10 w-10" />
@@ -171,7 +171,7 @@ export default function Login({ status }: { status?: string }) {
                                 <img
                                     src={store.logo}
                                     alt={store.name}
-                                    className="h-9 w-9 object-contain"
+                                    className="h-9 w-9 shrink-0 object-contain"
                                 />
                             ) : (
                                 <PitouLogo className="h-9 w-9" />

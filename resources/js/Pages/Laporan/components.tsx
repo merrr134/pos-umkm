@@ -1,7 +1,14 @@
+import { isNativeDownload, nativeDownload } from '@/lib/download';
 import { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ComponentType, ReactNode, SVGAttributes } from 'react';
+import {
+    ComponentType,
+    MouseEvent as ReactMouseEvent,
+    ReactNode,
+    SVGAttributes,
+    useState,
+} from 'react';
 
 /* Komponen bersama halaman Laporan (Fase 10) */
 
@@ -66,22 +73,63 @@ export function ExportButtons({
     params: Record<string, string>;
 }) {
     const buttonClass =
-        'inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50';
+        'inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60';
+
+    // Di Android (Capacitor) unduhan ditangani secara native karena
+    // WebView tidak bisa mengunduh via <a href>; di web, anchor jalan
+    // normal. Lihat [[lib/download]].
+    const [busy, setBusy] = useState<'pdf' | 'excel' | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const pdfUrl = route(routeName, { format: 'pdf', ...params });
+    const excelUrl = route(routeName, { format: 'excel', ...params });
+
+    const handleNative = async (
+        e: ReactMouseEvent,
+        format: 'pdf' | 'excel',
+        url: string,
+    ) => {
+        if (!isNativeDownload()) return; // biarkan browser menangani <a>
+        e.preventDefault();
+        if (busy) return;
+        setBusy(format);
+        setError(null);
+        try {
+            await nativeDownload(url, `laporan.${format === 'pdf' ? 'pdf' : 'xlsx'}`);
+        } catch (err) {
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : 'Gagal mengunduh file. Coba lagi.',
+            );
+        } finally {
+            setBusy(null);
+        }
+    };
 
     return (
-        <div className="flex gap-2">
-            <a
-                href={route(routeName, { format: 'pdf', ...params })}
-                className={buttonClass}
-            >
-                Export PDF
-            </a>
-            <a
-                href={route(routeName, { format: 'excel', ...params })}
-                className={buttonClass}
-            >
-                Export Excel
-            </a>
+        <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+                <a
+                    href={pdfUrl}
+                    onClick={(e) => handleNative(e, 'pdf', pdfUrl)}
+                    aria-disabled={busy !== null}
+                    className={buttonClass}
+                >
+                    {busy === 'pdf' ? 'Menyiapkan…' : 'Export PDF'}
+                </a>
+                <a
+                    href={excelUrl}
+                    onClick={(e) => handleNative(e, 'excel', excelUrl)}
+                    aria-disabled={busy !== null}
+                    className={buttonClass}
+                >
+                    {busy === 'excel' ? 'Menyiapkan…' : 'Export Excel'}
+                </a>
+            </div>
+            {error && (
+                <p className="text-sm font-medium text-red-600">{error}</p>
+            )}
         </div>
     );
 }

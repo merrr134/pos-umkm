@@ -109,7 +109,7 @@ function SidebarContent({ role }: { role: Role }) {
                     <img
                         src={store.logo}
                         alt={store.name}
-                        className="h-9 w-9 object-contain"
+                        className="h-9 w-9 shrink-0 object-contain"
                     />
                 ) : (
                     <PitouLogo className="h-9 w-9" />
@@ -361,6 +361,24 @@ export default function Authenticated({
     }, []);
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Kunci scroll latar saat sidebar mobile terbuka agar halaman di
+    // belakang overlay tidak ikut bergeser (mencegah header/ikon menu
+    // "berpindah" saat digulir). Dipulihkan otomatis saat ditutup.
+    useEffect(() => {
+        if (!sidebarOpen) return;
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = prev;
+        };
+    }, [sidebarOpen]);
+
+    // Tutup sidebar otomatis saat berpindah halaman (mis. klik menu).
+    useEffect(() => {
+        const off = router.on('navigate', () => setSidebarOpen(false));
+        return () => off();
+    }, []);
 
     return (
         <div className="min-h-screen bg-[#f5f6fa]">
